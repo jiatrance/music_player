@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:music_player/bottom_controls.dart';
 import 'package:music_player/songs.dart';
 import 'package:music_player/theme.dart';
 
@@ -47,10 +48,11 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         children: <Widget>[
           Expanded(
-            child: Center(
-              child: Container(
-                width : 125.0,
-                height : 125.0,
+              child: Center(
+            child: Container(
+              width: 125.0,
+              height: 125.0,
+              child: RadialSeekBar(
                 child: ClipOval(
                   clipper: CircleClipper(),
                   child: Image.network(
@@ -60,106 +62,135 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
-            )
-          ),
-
+            ),
+          )),
           Container(
             width: double.infinity,
             height: 125.0,
           ),
-          Container(
-            width: double.infinity,
-            color: accentColor,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 40.0, bottom: 50.0),
-              child: Column(
-                children: <Widget>[
-                  RichText(
-                    text: TextSpan(
-                        text: 'Song Title\n',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 4.0,
-                          height: 1.5,
-                        )),
-                  ),
-                  RichText(
-                    text: TextSpan(
-                        text: 'Artist Name',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.75),
-                          fontSize: 12.0,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 3.0,
-                          height: 1.0,
-                        )),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 40.0),
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(child: Container(),),
-                        IconButton(icon: Icon(
-                          Icons.skip_previous,
-                          color: Colors.white,
-                          size: 35.0,
-                          ),
-                          onPressed: (){},
-                        ),
-                        Expanded(child: Container(),),
-                        RawMaterialButton(
-                          shape: CircleBorder(),
-                          fillColor: Colors.white,
-                          splashColor: lightColor,
-                          highlightColor: lightColor.withOpacity(0.5),
-                          elevation: 6.0,
-                          highlightElevation: 3.0,
-                          onPressed: (){},
-                          child: Padding(
-                            padding:EdgeInsets.all(8.0),
-                            child:Icon(
-                              Icons.play_arrow,
-                              color:darkAccentColor,
-                              size:35.0
-                            )
-                          ),
-                        ),
-                        Expanded(child: Container(),),
-                        IconButton(icon: Icon(
-                          Icons.skip_next,
-                          color: Colors.white,
-                          size: 35.0,
-                          ),
-                          onPressed: (){},
-                        ),
-                        Expanded(child: Container(),),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          new BottomControls(),
         ],
       ),
     );
   }
 }
 
-class CircleClipper extends CustomClipper<Rect>{
+class RadialSeekBar extends StatefulWidget {
+  final double trackWidth;
+  final Color trackColor;
+  final double progressWidth;
+  final Color progressColor;
+  final double progressPercent;
+  final double thumbSize;
+  final Color thumbColor;
+  final double thumbPosition;
+  final Widget child;
+
+  RadialSeekBar(
+      {this.trackWidth = 3.0,
+      this.trackColor = Colors.grey,
+      this.progressWidth = 5.0,
+      this.progressColor = Colors.black,
+      this.progressPercent = 0.2,
+      this.thumbSize = 10.0,
+      this.thumbColor = Colors.black,
+      this.thumbPosition = 0.2,
+      this.child});
+
+  @override
+  State<StatefulWidget> createState() {
+    return _RadialSeekBarState();
+  }
+}
+
+class _RadialSeekBarState extends State<RadialSeekBar> {
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      foregroundPainter: RadialSeekBarPainter(
+          trackWidth: widget.trackWidth,
+          trackColor: widget.trackColor,
+          progressWidth: widget.progressWidth,
+          progressColor: widget.progressColor,
+          progressPercent: widget.progressPercent,
+          thumbSize: widget.thumbSize,
+          thumbColor: widget.thumbColor,
+          thumbPosition: widget.thumbPosition),
+      child: widget.child,
+    );
+  }
+}
+
+class RadialSeekBarPainter extends CustomPainter {
+  final double trackWidth;
+  final Color trackColor;
+  final Paint trackPaint;
+  final double progressWidth;
+  final Color progressColor;
+  final Paint progressPaint;
+  final double progressPercent;
+  final double thumbSize;
+  final Color thumbColor;
+  final Paint thumbPaint;
+  final double thumbPosition;
+
+  RadialSeekBarPainter({
+    @required this.trackWidth,
+    @required this.trackColor,
+    @required this.progressWidth,
+    @required this.progressColor,
+    @required this.progressPercent,
+    @required this.thumbSize,
+    @required this.thumbColor,
+    @required this.thumbPosition,
+  })  : trackPaint = Paint()
+          ..color = trackColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = trackWidth,
+        progressPaint = Paint()
+          ..color = progressColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = progressWidth
+          ..strokeCap = StrokeCap.round,
+        thumbPaint = Paint()
+          ..color = thumbColor
+          ..style = PaintingStyle.fill;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = min(size.width, size.height) / 2;
+
+    canvas.drawCircle(center, radius, trackPaint);
+
+    final progressAngle = 2 * pi * progressPercent;
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), -pi / 2,
+        progressAngle, false, progressPaint);
+
+    final thunmRadius = thumbSize / 2;
+    final thumbAngle = 2 * pi * thumbPosition - pi / 2;
+    final thumbX = cos(thumbAngle) * radius;
+    final thumbY = sin(thumbAngle) * radius;
+    final thumbCenter = Offset(thumbX, thumbY)+center;
+    canvas.drawCircle(thumbCenter, thunmRadius, thumbPaint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+class CircleClipper extends CustomClipper<Rect> {
   @override
   Rect getClip(Size size) {
     return Rect.fromCircle(
-      center:Offset(size.width/2, size.height/2),
-      radius: min(size.width,size.height)/2
-    );
+        center: Offset(size.width / 2, size.height / 2),
+        radius: min(size.width, size.height) / 2);
   }
 
   @override
   bool shouldReclip(CustomClipper<Rect> oldClipper) {
     return true;
   }
-
 }
