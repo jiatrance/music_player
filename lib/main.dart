@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:music_player/songs.dart';
 import 'package:music_player/theme.dart';
@@ -49,10 +51,13 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Container(
                 width : 125.0,
                 height : 125.0,
-                child: Image.network(
-                  demoPlaylist.songs[0].albumArtUrl,
-                  scale: 1.0,
-                  fit: BoxFit.cover,
+                child: ClipOval(
+                  clipper: CircleClipper(),
+                  child: Image.network(
+                    demoPlaylist.songs[0].albumArtUrl,
+                    scale: 1.0,
+                    fit: BoxFit.fill,
+                  ),
                 ),
               ),
             )
@@ -141,4 +146,20 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+class CircleClipper extends CustomClipper<Rect>{
+  @override
+  Rect getClip(Size size) {
+    return Rect.fromCircle(
+      center:Offset(size.width/2, size.height/2),
+      radius: min(size.width,size.height)/2
+    );
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Rect> oldClipper) {
+    return true;
+  }
+
 }
