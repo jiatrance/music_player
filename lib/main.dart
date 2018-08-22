@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:music_player/songs.dart';
 import 'package:music_player/theme.dart';
 
 void main() => runApp(new MyApp());
@@ -48,7 +49,11 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Container(
                 width : 125.0,
                 height : 125.0,
-                child: Image.network('http://img0.imgtn.bdimg.com/it/u=453406035,498615673&fm=214&gp=0.jpg'),
+                child: Image.network(
+                  demoPlaylist.songs[0].albumArtUrl,
+                  scale: 1.0,
+                  fit: BoxFit.cover,
+                ),
               ),
             )
           ),
