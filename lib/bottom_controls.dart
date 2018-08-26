@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music_player/theme.dart';
+import 'package:fluttery_audio/fluttery_audio.dart';
 
 class BottomControls extends StatelessWidget {
   const BottomControls({
@@ -45,17 +46,21 @@ class BottomControls extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 40.0),
                 child: Row(
                   children: <Widget>[
-                    Expanded(child: Container(),),
-
+                    Expanded(
+                      child: Container(),
+                    ),
                     new PreviousButton(),
-                    Expanded(child: Container(),),
-
+                    Expanded(
+                      child: Container(),
+                    ),
                     new PlayPauseButton(),
-                    
-                    Expanded(child: Container(),),
-
+                    Expanded(
+                      child: Container(),
+                    ),
                     new NextButton(),
-                    Expanded(child: Container(),),
+                    Expanded(
+                      child: Container(),
+                    ),
                   ],
                 ),
               ),
@@ -74,22 +79,39 @@ class PlayPauseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RawMaterialButton(
-      shape: CircleBorder(),
-      fillColor: Colors.white,
-      splashColor: lightColor,
-      highlightColor: lightColor.withOpacity(0.5),
-      elevation: 6.0,
-      highlightElevation: 3.0,
-      onPressed: (){},
-      child: Padding(
-        padding:EdgeInsets.all(8.0),
-        child:Icon(
-          Icons.play_arrow,
-          color:darkAccentColor,
-          size:35.0
-        )
-      ),
+    return AudioComponent(
+      updateMe: [
+         WatchableAudioProperties.audioPlayerState
+      ],
+      playerBuilder: (BuildContext context, AudioPlayer player, Widget child) {
+        IconData icon=Icons.music_note;
+        Color buttonColor=lightColor;
+        Function onPressed;
+
+        if(player.state==AudioPlayerState.playing){
+          icon=Icons.pause;
+           onPressed=player.pause;
+           buttonColor=Colors.white;
+        }else if(player.state==AudioPlayerState.paused|| player.state==AudioPlayerState.completed){
+          icon=Icons.play_arrow;
+           onPressed=player.play;
+           buttonColor=Colors.white;
+        }
+
+        return RawMaterialButton(
+          shape: CircleBorder(),
+          fillColor: buttonColor,
+          splashColor: lightColor,
+          highlightColor: lightColor.withOpacity(0.5),
+          elevation: 6.0,
+          highlightElevation: 3.0,
+          onPressed: onPressed,
+          child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child:
+                  Icon(icon, color: darkAccentColor, size: 35.0)),
+        );
+      },
     );
   }
 }
@@ -101,12 +123,13 @@ class PreviousButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(icon: Icon(
-      Icons.skip_previous,
-      color: Colors.white,
-      size: 35.0,
+    return IconButton(
+      icon: Icon(
+        Icons.skip_previous,
+        color: Colors.white,
+        size: 35.0,
       ),
-      onPressed: (){},
+      onPressed: () {},
     );
   }
 }
@@ -118,12 +141,13 @@ class NextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(icon: Icon(
-      Icons.skip_next,
-      color: Colors.white,
-      size: 35.0,
+    return IconButton(
+      icon: Icon(
+        Icons.skip_next,
+        color: Colors.white,
+        size: 35.0,
       ),
-      onPressed: (){},
+      onPressed: () {},
     );
   }
 }
