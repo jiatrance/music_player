@@ -22,7 +22,7 @@ class BottomControls extends StatelessWidget {
             children: <Widget>[
               RichText(
                 text: TextSpan(
-                    text: 'Song Title\n',
+                    text: '她说\n',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14.0,
@@ -33,7 +33,7 @@ class BottomControls extends StatelessWidget {
               ),
               RichText(
                 text: TextSpan(
-                    text: 'Artist Name',
+                    text: '林俊杰',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.75),
                       fontSize: 12.0,
